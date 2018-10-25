@@ -24,8 +24,7 @@
   },
   "homepage": "https://github.com/tableflip/react-native-toaster#readme",
   "dependencies": {
-    "prop-types": "^15.6.0",
-    "react-native-swipeable": "^0.6.0"
+    "prop-types": "^15.6.0"
   },
   "devDependencies": {
     "babel-eslint": "^7.1.1",

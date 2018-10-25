@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import Swipeable from 'react-native-swipeable';
 import {
   Animated,
   TouchableWithoutFeedback,
@@ -8,6 +7,7 @@ import {
   Text
 } from 'react-native'
 import ToastStyles from './ToastStyles'
+import Swipeable from './Swipeable';
 
 const noop = () => 0
 
@@ -127,8 +127,7 @@ class Toast extends Component {
     } : {}
 
     return (
-      <Swipeable {...swipeableProps}>
-        <Animated.View style={{
+      <Swipeable {...swipeableProps} style={{
           position: 'absolute',
           bottom: 0,
           right: 0,
@@ -139,7 +138,6 @@ class Toast extends Component {
           <TouchableWithoutFeedback onPress={this.onPress}>
             {text}
           </TouchableWithoutFeedback>
-        </Animated.View>
       </Swipeable>
     )
   }
