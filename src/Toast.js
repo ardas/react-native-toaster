@@ -37,6 +37,11 @@ class Toast extends Component {
     this.showToast()
   }
 
+  componentWillUnmount () {
+    const { timeoutId } = this.state;
+    clearTimeout(timeoutId)
+  }
+
   componentWillReceiveProps (nextProps) {
     if (this.props.id !== nextProps.id) {
       this.showToast()
@@ -70,12 +75,20 @@ class Toast extends Component {
     setTimeout(this.props.onHide, 350)
   }
 
-  onPress = () => this.hideToast() && this.props.onPress()
+  onPress = () => {
+    const {onPress} = this.props;
+
+    this.hideToast()
+
+    if(onPress){
+      onPress()
+    }
+  }
 
   render () {
     const y = this.state.animatedValue.interpolate({
       inputRange: [0, 1],
-      outputRange: [-this.props.height, 0]
+      outputRange: [this.props.height, 0]
     })
 
     const { styles } = this.props
@@ -92,7 +105,7 @@ class Toast extends Component {
     return (
       <Animated.View style={{
         position: 'absolute',
-        top: 0,
+        bottom: 0,
         right: 0,
         left: 0,
         zIndex: 9999,
