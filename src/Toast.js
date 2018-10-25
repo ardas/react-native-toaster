@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import Swipeable from 'react-native-swipeable';
 import {
   Animated,
   TouchableWithoutFeedback,
@@ -31,7 +32,10 @@ class Toast extends Component {
     onPress: noop
   }
 
-  state = { animatedValue: new Animated.Value(0), timeoutId: null }
+  state = {
+    animatedValue: new Animated.Value(0),
+    timeoutId: null,
+  }
 
   componentWillMount () {
     this.showToast()
@@ -63,7 +67,7 @@ class Toast extends Component {
     this.setState({ timeoutId }, onShow)
   }
 
-  hideToast () {
+  hideToast() {
     const { timeoutId, animatedValue } = this.state
 
     clearTimeout(timeoutId)
@@ -71,6 +75,14 @@ class Toast extends Component {
     Animated
       .timing(animatedValue, { toValue: 0, duration: 350 })
       .start()
+
+    setTimeout(this.props.onHide, 350)
+  }
+
+  hideToastBySwiping () {
+    const { timeoutId } = this.state
+
+    clearTimeout(timeoutId)
 
     setTimeout(this.props.onHide, 350)
   }
@@ -91,7 +103,7 @@ class Toast extends Component {
       outputRange: [this.props.height, 0]
     })
 
-    const { styles } = this.props
+    const { styles, removeOnSwipe, distanceToRemove } = this.props
     let text = this.props.text
 
     if (Object.prototype.toString.call(text) === '[object String]') {
@@ -102,19 +114,33 @@ class Toast extends Component {
       )
     }
 
+    const swipeableProps = removeOnSwipe ? {
+      rightContent: <View />,
+      onRightActionRelease: () => this.hideToastBySwiping(),
+      rightActionActivationDistance: distanceToRemove,
+      rightActionReleaseAnimationFn: animatedXY => {
+        return Animated.timing(animatedXY.x, {
+          toValue: -distanceToRemove*2,
+          duration: 350
+        })
+      }
+    } : {}
+
     return (
-      <Animated.View style={{
-        position: 'absolute',
-        bottom: 0,
-        right: 0,
-        left: 0,
-        zIndex: 9999,
-        transform: [{ translateY: y }]
-      }}>
-        <TouchableWithoutFeedback onPress={this.onPress}>
-          {text}
-        </TouchableWithoutFeedback>
-      </Animated.View>
+      <Swipeable {...swipeableProps}>
+        <Animated.View style={{
+          position: 'absolute',
+          bottom: 0,
+          right: 0,
+          left: 0,
+          zIndex: 9999,
+          transform: [{ translateY: y }]
+        }}>
+          <TouchableWithoutFeedback onPress={this.onPress}>
+            {text}
+          </TouchableWithoutFeedback>
+        </Animated.View>
+      </Swipeable>
     )
   }
 }

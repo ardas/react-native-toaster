@@ -86,9 +86,21 @@ class Toaster extends Component {
   }
 
   render () {
-    const { messages } = this.state
-    if (!messages.length) return null
-    return <Toast {...messages[0]} onShow={this.onShow} onHide={this.onHide} onPress={this.onPress} />
+    const { messages } = this.state;
+    const { removeOnSwipe, distanceToRemove } = this.props;
+
+    if (!messages.length){
+      return null
+    }
+
+    return <Toast
+              {...messages[0]}
+              onShow={this.onShow}
+              onHide={this.onHide}
+              onPress={this.onPress}
+              removeOnSwipe={removeOnSwipe}
+              distanceToRemove={distanceToRemove}
+            />
   }
 }
 
