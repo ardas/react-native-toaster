@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import {
   Animated,
+  Dimensions,
   TouchableWithoutFeedback,
   View,
   Text
@@ -10,6 +11,8 @@ import ToastStyles from './ToastStyles'
 import Swipeable from './Swipeable';
 
 const noop = () => 0
+
+const { width: deviceWidth } = Dimensions.get('window')
 
 class Toast extends Component {
   static propTypes = {
@@ -35,6 +38,8 @@ class Toast extends Component {
   state = {
     animatedValue: new Animated.Value(0),
     timeoutId: null,
+    hideTimeout: null,
+    hideBySwipingTimeout: null,
   }
 
   componentWillMount () {
@@ -42,8 +47,15 @@ class Toast extends Component {
   }
 
   componentWillUnmount () {
-    const { timeoutId } = this.state;
+    const {
+      timeoutId,
+      hideTimeout,
+      hideBySwipingTimeout,
+    } = this.state;
+
     clearTimeout(timeoutId)
+    clearTimeout(hideTimeout)
+    clearTimeout(hideBySwipingTimeout)
   }
 
   componentWillReceiveProps (nextProps) {
@@ -69,6 +81,7 @@ class Toast extends Component {
 
   hideToast() {
     const { timeoutId, animatedValue } = this.state
+    const { onHide } = this.props;
 
     clearTimeout(timeoutId)
 
@@ -76,7 +89,10 @@ class Toast extends Component {
       .timing(animatedValue, { toValue: 0, duration: 350 })
       .start()
 
-    setTimeout(this.props.onHide, 350)
+    if(onHide) {
+      hideTimeout = setTimeout(onHide, 350)
+      this.setState({ hideTimeout })
+    }
   }
 
   hideToastBySwiping () {
@@ -84,7 +100,8 @@ class Toast extends Component {
 
     clearTimeout(timeoutId)
 
-    setTimeout(this.props.onHide, 350)
+    const hideBySwipingTimeout = setTimeout(this.props.onHide, 350);
+    this.setState({ hideBySwipingTimeout });
   }
 
   onPress = () => {
@@ -120,7 +137,7 @@ class Toast extends Component {
       rightActionActivationDistance: distanceToRemove,
       rightActionReleaseAnimationFn: animatedXY => {
         return Animated.timing(animatedXY.x, {
-          toValue: -distanceToRemove*2,
+          toValue: -deviceWidth,
           duration: 350
         })
       }
